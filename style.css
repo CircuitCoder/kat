@@ -1,0 +1,11 @@
+body {
+  box-sizing: border-box;
+  font-family: 'Roboto', 'Helvetica', 'Source Sans Pro', 'Source Han Sans SC', 'PingFang SC', 'Microsoft YaHei', sans-serif;
+
+  width: 240px;
+  padding: 10px;
+}
+
+.main-btn {
+  width: 100%;
+}
