@@ -1,11 +1,78 @@
+@font-face {
+  font-family: 'Material Icons';
+  font-style: normal;
+  font-weight: 400;
+  src: local('Material Icons'),
+    local('MaterialIcons-Regular'),
+    url(./lib/MaterialIcons-Regular.woff) format('woff'),
+    url(./lib/MaterialIcons-Regular.woff2) format('woff2');
+}
+
+.material-icons {
+  font-family: 'Material Icons';
+  font-weight: normal;
+  font-style: normal;
+  font-size: 24px;  /* Preferred icon size */
+  display: inline-block;
+  line-height: 1;
+  text-transform: none;
+  letter-spacing: normal;
+  word-wrap: normal;
+  white-space: nowrap;
+  direction: ltr;
+
+  /* Support for all WebKit browsers. */
+  -webkit-font-smoothing: antialiased;
+  /* Support for Safari and Chrome. */
+  text-rendering: optimizeLegibility;
+
+  /* Support for Firefox. */
+  -moz-osx-font-smoothing: grayscale;
+
+  /* Support for IE. */
+  font-feature-settings: 'liga';
+}
+
+* {
+  box-sizing: inherit;
+}
+
+
 body {
   box-sizing: border-box;
   font-family: 'Roboto', 'Helvetica', 'Source Sans Pro', 'Source Han Sans SC', 'PingFang SC', 'Microsoft YaHei', sans-serif;
 
-  width: 240px;
-  padding: 10px;
+  margin: 0;
+}
+
+#root {
+  width: 320px;
+  height: 400px;
+
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
 }
 
 .main-btn {
+  padding: 10px;
+}
+
+.main-btn button {
   width: 100%;
+}
+
+.main-list {
+  flex: 1;
+}
+
+.list-text {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  margin-right: 20px;
+}
+
+.list-text > * {
+  overflow: hidden;
 }
