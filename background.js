@@ -25,6 +25,7 @@ const sset = promisify(chrome.storage.local, chrome.storage.local.set);
 const sget = promisify(chrome.storage.local, chrome.storage.local.get);
 const tget = promisify(chrome.tabs, chrome.tabs.get);
 const tupd = promisify(chrome.tabs, chrome.tabs.update);
+const wupd = promisify(chrome.windows, chrome.windows.update);
 const bset = promisify(chrome.browserAction, chrome.browserAction.setBadgeText);
 const bcset = promisify(chrome.browserAction, chrome.browserAction.setBadgeBackgroundColor);
 
@@ -113,7 +114,8 @@ async function assignCat() {
     title: '喵~',
     message,
     iconUrl: 'img/default_icon.png',
-  }, id => notifMapper.set(id, desc.tab));
+    priority: 2,
+  }, id => notifMapper.set(id, desc.id));
 }
 
 async function dropWeight() {
@@ -168,8 +170,13 @@ chrome.runtime.onInstalled.addListener(() => {
       dropWeight();
   });
 
-  chrome.notifications.onClicked.addListener(id => {
-    if(notifMapper.has(id))
-      tupd(notifMapper.get(id), { active: true });
+  chrome.notifications.onClicked.addListener(async nid => {
+    if(notifMapper.has(nid)) {
+      const id = notifMapper.get(nid);
+
+      const tab = await tget(id);
+      await tupd(id, { active: true });
+      await wupd(tab.windowId, { focused: true });
+    }
   });
 });
