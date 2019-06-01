@@ -77,3 +77,16 @@ body {
 .list-text > * {
   overflow: hidden;
 }
+
+.dialog-title {
+  flex: 1;
+  margin-left: 8px !important;
+}
+
+.dialog-toolbar {
+  position: relative !important;
+}
+
+.dialog-content {
+  margin-top: 16px;
+}

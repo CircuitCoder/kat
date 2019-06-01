@@ -111,3 +111,10 @@ export async function getAllCats() {
   list.sort((a, b) => b.weight - a.weight);
   return list;
 }
+
+export async function setCatName(cat, name) {
+  const cats = (await sget(['cats'])).cats || {};
+  if(!(cat in cats)) return;
+  cats[cat].name = name;
+  await sset({ cats });
+}

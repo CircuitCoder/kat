@@ -7,6 +7,7 @@ import {
   getAllPendings,
   getAllCats,
   gotoTab,
+  setCatName,
 } from './storage.js';
 
 import {
@@ -32,6 +33,14 @@ const {
   Avatar,
   Paper,
   Badge,
+  Dialog,
+  DialogContent,
+  Slide,
+  Typography,
+  Toolbar,
+  AppBar,
+  TextField,
+  InputLabel,
 
   createMuiTheme,
   MuiThemeProvider,
@@ -53,10 +62,17 @@ const catStyle = ({ weight }) => {
   };
 }
 
+const DialogTransition = React.forwardRef((props, ref) => {
+  return html`<${Slide} direction="up" ref=${ref} ...${props} />`;
+});
+
 const App = () => {
   const [status, setStatus] = React.useState(null);
   const [list, setList] = React.useState([]);
   const [cats, setCats] = React.useState([]);
+  const [editCat, setEditCat] = React.useState({});
+  const [editCatName, setEditCatName] = React.useState(null);
+  const [editCatOpen, setEditCatOpen] = React.useState(false);
   const [tab, setTab] = React.useState(0);
 
   const reload = React.useCallback(() => {
@@ -84,6 +100,27 @@ const App = () => {
   const switchTab = React.useCallback((ev, t) => {
     setTab(t)
   }, []);
+
+  const startEditCat = React.useCallback(c => {
+    setEditCat(c);
+    setEditCatName(c.name);
+    setEditCatOpen(true);
+  });
+
+  const closeEditCat = React.useCallback(() => {
+    setEditCatOpen(false);
+  });
+
+  const commitEditCat = React.useCallback(() => {
+    setCatName(editCat.cat, editCatName).then(() => {
+      reload();
+      setEditCatOpen(false);
+    });
+  });
+
+  const changeCatName = React.useCallback(e => {
+    setEditCatName(e.target.value);
+  });
 
   let btn;
   console.log(status);
@@ -115,6 +152,7 @@ const App = () => {
   function renderCat(e) {
     return html`<${ListItem} key=${e.cat}>
       <${ListItemText} primary=${html`<span style=${catStyle(e)}>${e.cat}</span>`} secondary=${e.name + ' - ' + (Math.floor(e.weight / 10) / 100) + 'kg' } className="list-text" />
+      <${ListItemSecondaryAction}><${IconButton} onClick=${() => startEditCat(e)}><${Icon}>edit<//><//><//>
     <//>`;
   }
 
@@ -142,6 +180,29 @@ const App = () => {
       >
         <${BottomNavigationAction} label="零食" icon=${html`<${Badge} max=${9} color="secondary" badgeContent=${list.length}><${Icon}>search<//><//>`} />
         <${BottomNavigationAction} label="猫窝" icon=${html`<${Icon}>home<//>`} />
+      <//>
+    <//>
+
+    <${Dialog} fullScreen open=${editCatOpen} onClose=${closeEditCat} TransitionComponent=${DialogTransition}>
+      <${AppBar} className="dialog-toolbar">
+        <${Toolbar}>
+          <${IconButton} onClick=${closeEditCat}><${Icon}>close<//><//>
+          <${Typography} variant="h6" className="dialog-title">给猫咪改个名字<//>
+          <${Button} onClick=${commitEditCat} disabled=${editCatName === ''}>保存<//>
+        <//>
+      <//>
+
+      <${DialogContent} className="dialog-content">
+        <${InputLabel} shrink>猫咪<//>
+        <${Typography} variant="body1" style=${catStyle(editCat)}>${editCat.cat}<//>
+
+        <${TextField}
+          value=${editCatName}
+          onChange=${changeCatName}
+          label="名字"
+          fullWidth
+          margin="normal"
+        />
       <//>
     <//>
   <//>`
