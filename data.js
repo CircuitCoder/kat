@@ -7,9 +7,9 @@ export const DESSERTS = [
   [':tangerine:', 10],
   [':peach:', 15],
   [':strawberry:', 20],
-  [':ice_cream:', 100],
-  [':doughnut:', 200],
-  [':cake:', 400],
+  [':ice_cream:', 400],
+  [':doughnut:', 400],
+  [':cake:', 800],
 ].map(([e, w]) => [emoji.replace_colons(e), w]);
 
 function randPick(arr) {

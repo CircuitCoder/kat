@@ -4,7 +4,7 @@
   "description": "Kat kAt kaT",
   "manifest_version": 2,
 
-  "permissions": ["tabs", "storage", "alarms"],
+  "permissions": ["tabs", "storage", "alarms", "notifications"],
 
   "background": {
     "scripts": ["background.js"],

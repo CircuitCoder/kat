@@ -24,8 +24,11 @@ const DROP_RATE_MAX = 0.975;
 const sset = promisify(chrome.storage.local, chrome.storage.local.set);
 const sget = promisify(chrome.storage.local, chrome.storage.local.get);
 const tget = promisify(chrome.tabs, chrome.tabs.get);
+const tupd = promisify(chrome.tabs, chrome.tabs.update);
 const bset = promisify(chrome.browserAction, chrome.browserAction.setBadgeText);
 const bcset = promisify(chrome.browserAction, chrome.browserAction.setBadgeBackgroundColor);
+
+const notifMapper = new Map();
 
 async function pendingGC(id) {
   const now = (await sget(['pending'])).pending || [];
@@ -68,6 +71,7 @@ async function assignCat() {
   const cat = randPick(availableCats);
 
   let name;
+  let newCat = false;
   const cats = (await sget('cats')).cats || {};
   if(!cats[cat]) {
     cats[cat] = {
@@ -77,6 +81,7 @@ async function assignCat() {
     await sset({ cats });
 
     name = '喵喵';
+    newCat = true;
   } else {
     cats[cat].weight += desc.weight;
     await sset({ cats });
@@ -96,6 +101,19 @@ async function assignCat() {
     tabId: desc.id,
   });
   await bcset({ color: '#c99134', tabId: desc.id });
+
+  chrome.runtime.sendMessage({
+    msg: 'reload',
+  });
+
+  const message = newCat ? `${cat} 一只新猫咪出现了! 吃掉了 ${desc.dessert}` : `${cat} : ${name} 吃掉了 ${desc.dessert}`;
+
+  chrome.notifications.create({
+    type: 'basic',
+    title: '喵~',
+    message,
+    iconUrl: 'img/default_icon.png',
+  }, id => notifMapper.set(id, desc.tab));
 }
 
 async function dropWeight() {
@@ -110,6 +128,10 @@ async function dropWeight() {
   }
 
   await sset({ cats });
+
+  chrome.runtime.sendMessage({
+    msg: 'reload',
+  });
 }
 
 chrome.runtime.onInstalled.addListener(() => {
@@ -144,5 +166,10 @@ chrome.runtime.onInstalled.addListener(() => {
       assignCat();
     else if(alarm.name === 'drop-weight')
       dropWeight();
+  });
+
+  chrome.notifications.onClicked.addListener(id => {
+    if(notifMapper.has(id))
+      tupd(notifMapper.get(id), { active: true });
   });
 });
