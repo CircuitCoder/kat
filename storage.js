@@ -104,3 +104,10 @@ export async function gotoTab(id) {
   await tupd(id, { active: true });
   await wupd(tab.windowId, { focused: true });
 }
+
+export async function getAllCats() {
+  const cats = (await sget(['cats'])).cats || {};
+  const list = Object.keys(cats).map(k => ({ ...cats[k], cat: k }));
+  list.sort((a, b) => b.weight - a.weight);
+  return list;
+}

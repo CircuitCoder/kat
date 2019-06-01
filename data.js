@@ -28,6 +28,6 @@ export function randDessert() {
   const [dessert, weight] = randPick(DESSERTS);
   return {
     dessert,
-    weight: rangeRatioDist(weight, 0.1),
+    weight: rangeRatioDist(weight, 0.2),
   };
 }
