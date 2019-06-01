@@ -90,11 +90,11 @@ const App = () => {
   }, []);
 
   const apply = React.useCallback(() => {
-    applyDessert(randDessert()).then(setStatus).then(() => reload());
+    applyDessert(randDessert()).then(reload);
   }, []);
 
   const cancel = React.useCallback(() => {
-    cancelDessert().then(setStatus).then(() => reload());
+    cancelDessert().then(reload);
   }, []);
 
   const switchTab = React.useCallback((ev, t) => {

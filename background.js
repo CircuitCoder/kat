@@ -42,7 +42,12 @@ async function pendingGC(id) {
 
   console.log('GC Result: ', updated);
 
-  await sset({ pending: updated });
+  if(updated.length !== now.length) {
+    await sset({ pending: updated });
+    chrome.runtime.sendMessage({
+      msg: 'reload',
+    });
+  }
   return updated;
 }
 

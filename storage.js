@@ -55,13 +55,19 @@ export async function applyDessert({ dessert, weight }, _id = null) {
 
   await pendingAdd(id);
 
-  return await tabSet(id, {
+  const result = await tabSet(id, {
     type: 'waiting',
     dessert,
     weight,
     title: tab.title,
     id,
   });
+
+  chrome.runtime.sendMessage({
+    msg: 'reload',
+  });
+
+  return result;
 }
 
 export async function cancelDessert(_id = null) {
@@ -75,9 +81,15 @@ export async function cancelDessert(_id = null) {
 
   await pendingDrop(id);
 
-  return await tabSet(id, {
+  const result = await tabSet(id, {
     type: 'idle',
   });
+
+  chrome.runtime.sendMessage({
+    msg: 'reload',
+  });
+
+  return result;
 }
 
 export async function getStatus(_id = null) {
@@ -117,4 +129,19 @@ export async function setCatName(cat, name) {
   if(!(cat in cats)) return;
   cats[cat].name = name;
   await sset({ cats });
+
+  const list = (await sget(['pending'])).pending || [];
+  const result = await Promise.all(list.map(tabGet));
+
+  for(const desc of result) {
+    if(desc.type === 'cat' && desc.cat === cat) {
+      desc.name = name;
+      await tabSet(desc.id, desc);
+      break;
+    }
+  }
+
+  chrome.runtime.sendMessage({
+    msg: 'reload',
+  });
 }
