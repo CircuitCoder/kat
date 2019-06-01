@@ -76,7 +76,7 @@ async function assignCat() {
   const desc = randPick(waiting);
   const cat = randPick(availableCats);
 
-  let name;
+  let catData;
   let newCat = false;
   const cats = (await sget('cats')).cats || {};
   if(!cats[cat]) {
@@ -86,12 +86,13 @@ async function assignCat() {
     };
     await sset({ cats });
 
-    name = '喵喵';
+    catData = cats[cat];
     newCat = true;
   } else {
     cats[cat].weight += desc.weight;
     await sset({ cats });
-    name = cats[cat].name;
+
+    catData = cats[cat];
   }
 
   await sset({ [`tab:${desc.id}`]: {
@@ -99,7 +100,8 @@ async function assignCat() {
     id: desc.id,
     title: desc.title,
     cat,
-    name,
+    name: catData.name,
+    weight: catData.weight,
   }});
 
   await bset({
@@ -135,6 +137,19 @@ async function dropWeight() {
   }
 
   await sset({ cats });
+
+  const list = (await sget(['pending'])).pending || [];
+  const result = await Promise.all(list.map(async id => {
+    const resp = await sget([`tab:${id}`]);
+    return resp[`tab:${id}`];
+  }));
+
+  for(const desc of result) {
+    if(desc.type === 'cat') {
+      desc.weight = cats[desc.cat].weight;
+      await sset({ [`tab:${desc.id}`]: desc });
+    }
+  }
 
   chrome.runtime.sendMessage({
     msg: 'reload',

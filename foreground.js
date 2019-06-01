@@ -144,7 +144,7 @@ const App = () => {
     else
       return html`<${ListItem} key=${e.id}>
         <${ListItemAvatar}><${Avatar}><${Icon}>done<//><//><//>
-        <${ListItemText} primary=${e.title} secondary=${e.cat + ' - ' + e.name} className="list-text" />
+        <${ListItemText} primary=${e.title} secondary=${html`<span style=${catStyle({ weight: e.weight })}>${e.cat}</span> - ${e.name}`} className="list-text" />
         <${ListItemSecondaryAction}><${IconButton} onClick=${() => gotoTab(e.id)}><${Icon}>open_in_browser<//><//><//>
       <//>`;
   }
