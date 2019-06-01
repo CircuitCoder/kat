@@ -114,7 +114,7 @@ async function assignCat() {
     msg: 'reload',
   });
 
-  const message = newCat ? `${cat} 一只新猫咪出现了! 吃掉了 ${desc.dessert}` : `${cat} : ${name} 吃掉了 ${desc.dessert}`;
+  const message = newCat ? `${cat} 一只新猫咪出现了! 吃掉了 ${desc.dessert}` : `${cat} : ${catData.name} 吃掉了 ${desc.dessert}`;
 
   chrome.notifications.create({
     type: 'basic',
