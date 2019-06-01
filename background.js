@@ -24,6 +24,8 @@ const DROP_RATE_MAX = 0.975;
 const sset = promisify(chrome.storage.local, chrome.storage.local.set);
 const sget = promisify(chrome.storage.local, chrome.storage.local.get);
 const tget = promisify(chrome.tabs, chrome.tabs.get);
+const bset = promisify(chrome.browserAction, chrome.browserAction.setBadgeText);
+const bcset = promisify(chrome.browserAction, chrome.browserAction.setBadgeBackgroundColor);
 
 async function pendingGC(id) {
   const now = (await sget(['pending'])).pending || [];
@@ -50,15 +52,20 @@ async function assignCat() {
 
   const pending = (await sget(['pending'])).pending || [];
   const waiting = [];
+  const occupiedCats = new Set();
   for(const tab of pending) {
     const desc = (await sget([`tab:${tab}`]))[`tab:${tab}`];
     if(desc.type === 'waiting') waiting.push(desc);
+    else occupiedCats.add(desc.cat);
   }
 
   if(waiting.length == 0) return;
 
+  const availableCats = CATS.filter(e => !occupiedCats.has(e));
+  if(availableCats.length == 0) return;
+
   const desc = randPick(waiting);
-  const cat = randPick(CATS);
+  const cat = randPick(availableCats);
 
   let name;
   const cats = (await sget('cats')).cats || {};
@@ -71,6 +78,8 @@ async function assignCat() {
 
     name = '喵喵';
   } else {
+    cats[cat].weight += desc.weight;
+    await sset({ cats });
     name = cats[cat].name;
   }
 
@@ -81,6 +90,12 @@ async function assignCat() {
     cat,
     name,
   }});
+
+  await bset({
+    text: '喵~',
+    tabId: desc.id,
+  });
+  await bcset({ color: '#c99134', tabId: desc.id });
 }
 
 async function dropWeight() {

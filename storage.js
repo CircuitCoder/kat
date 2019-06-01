@@ -51,7 +51,7 @@ export async function applyDessert({ dessert, weight }, _id = null) {
     text: dessert,
     tabId: id,
   });
-  await bcset({ color: '#EEE' });
+  await bcset({ color: '#EEE', tabId: id });
 
   await pendingAdd(id);
 
