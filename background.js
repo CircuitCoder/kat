@@ -156,47 +156,43 @@ async function dropWeight() {
   });
 }
 
-chrome.runtime.onInstalled.addListener(() => {
-  // TODO: initialize cat storage
-  //
-  chrome.tabs.onCreated.addListener(({ id }) => {
-    chrome.storage.local.set({ [`tab:${id}`]: {
-      type: 'idle',
-    }});
-  })
+chrome.tabs.onCreated.addListener(({ id }) => {
+  chrome.storage.local.set({ [`tab:${id}`]: {
+    type: 'idle',
+  }});
+})
 
-  chrome.tabs.onActivated.addListener(({ tabId, windowId }) => {
-    console.log('Switching to: ', tabId);
-    // TODO: switch icon
-  });
+chrome.tabs.onActivated.addListener(({ tabId, windowId }) => {
+  console.log('Switching to: ', tabId);
+  // TODO: switch icon
+});
 
-  chrome.tabs.onRemoved.addListener(tabId => {
-    console.log('Closed: ', tabId);
-    pendingGC(tabId);
-  });
+chrome.tabs.onRemoved.addListener(tabId => {
+  console.log('Closed: ', tabId);
+  pendingGC(tabId);
+});
 
-  chrome.alarms.create('cat-pick', {
-    periodInMinutes: CAT_INTERVAL,
-  });
+chrome.alarms.create('cat-pick', {
+  periodInMinutes: CAT_INTERVAL,
+});
 
-  chrome.alarms.create('drop-weight', {
-    periodInMinutes: DROP_WEIGHT_INTERVAL,
-  });
+chrome.alarms.create('drop-weight', {
+  periodInMinutes: DROP_WEIGHT_INTERVAL,
+});
 
-  chrome.alarms.onAlarm.addListener(alarm => {
-    if(alarm.name === 'cat-pick')
-      assignCat();
-    else if(alarm.name === 'drop-weight')
-      dropWeight();
-  });
+chrome.alarms.onAlarm.addListener(alarm => {
+  if(alarm.name === 'cat-pick')
+    assignCat();
+  else if(alarm.name === 'drop-weight')
+    dropWeight();
+});
 
-  chrome.notifications.onClicked.addListener(async nid => {
-    if(notifMapper.has(nid)) {
-      const id = notifMapper.get(nid);
+chrome.notifications.onClicked.addListener(async nid => {
+  if(notifMapper.has(nid)) {
+    const id = notifMapper.get(nid);
 
-      const tab = await tget(id);
-      await tupd(id, { active: true });
-      await wupd(tab.windowId, { focused: true });
-    }
-  });
+    const tab = await tget(id);
+    await tupd(id, { active: true });
+    await wupd(tab.windowId, { focused: true });
+  }
 });
